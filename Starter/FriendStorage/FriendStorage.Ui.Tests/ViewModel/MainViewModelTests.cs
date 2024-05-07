@@ -18,6 +18,7 @@ namespace FriendStorage.Ui.Tests.ViewModel
         private readonly MainViewModel _viewModel;
         private readonly Mock<IEventAggregator> _eventAggregatorMock;
         private readonly OpenFriendEditViewEvent _openFriendEditViewEvent;
+        private readonly FriendDeletedEvent _friendDeletedEvent;
         private readonly List<Mock<IFriendEditViewModel>> _friendEditViewModelMocks;
 
         public MainViewModelTests()
@@ -26,9 +27,13 @@ namespace FriendStorage.Ui.Tests.ViewModel
             _navigationViewModelMock = new Mock<INavigationViewModel>();
 
             _openFriendEditViewEvent = new OpenFriendEditViewEvent();
+            _friendDeletedEvent = new FriendDeletedEvent();
+
             _eventAggregatorMock = new Mock<IEventAggregator>();
             _eventAggregatorMock.Setup(ea => ea.GetEvent<OpenFriendEditViewEvent>())
               .Returns(_openFriendEditViewEvent);
+            _eventAggregatorMock.Setup(ea => ea.GetEvent<FriendDeletedEvent>())
+              .Returns(_friendDeletedEvent);
 
             _viewModel = new MainViewModel(_navigationViewModelMock.Object,
               CreateFriendEditViewModel, _eventAggregatorMock.Object);
@@ -110,6 +115,20 @@ namespace FriendStorage.Ui.Tests.ViewModel
             _viewModel.SelectedFriendEditViewModel.Should().Be(friendEditVm);
 
             _friendEditViewModelMocks.First().Verify(vm => vm.Load(null), Times.Once);
+        }
+        [Fact]
+        public void ShouldRemoveFriendEditViewModelOnFriendDeletedEvent()
+        {
+            const int deletedFriendId = 7;
+
+            _openFriendEditViewEvent.Publish(deletedFriendId);
+            _openFriendEditViewEvent.Publish(8);
+            _openFriendEditViewEvent.Publish(9);
+
+            _friendDeletedEvent.Publish(deletedFriendId);
+
+            _viewModel.FriendEditViewModels.Should().HaveCount(2);
+            _viewModel.FriendEditViewModels.Should().NotContain(vm => vm.Friend.Id == deletedFriendId);
         }
     }
 }

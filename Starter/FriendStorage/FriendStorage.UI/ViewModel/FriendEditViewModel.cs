@@ -20,10 +20,14 @@ namespace FriendStorage.UI.ViewModel
         {
             _dataProvider = dataProvider;
             _eventAggregator = eventAggregator;
+
             SaveCommand = new DelegateCommand(OnSaveExecute, OnSaveCanExecute);
+            DeleteCommand = new DelegateCommand(OnDeleteExecute, OnDeleteCanExecute);
         }
 
         public ICommand SaveCommand { get; private set; }
+
+        public ICommand DeleteCommand { get; private set; }
 
         public virtual FriendWrapper Friend
         {
@@ -42,11 +46,16 @@ namespace FriendStorage.UI.ViewModel
 
             Friend = new FriendWrapper(friend);
             Friend.PropertyChanged += OnFriendPropertyChanged;
-            ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
+            InvalidateCommands();
         }
 
-        private void OnFriendPropertyChanged(object sender, PropertyChangedEventArgs e) => 
+        private void OnFriendPropertyChanged(object sender, PropertyChangedEventArgs e) => InvalidateCommands();
+
+        private void InvalidateCommands()
+        {
             ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
+            ((DelegateCommand)DeleteCommand).RaiseCanExecuteChanged();
+        }
 
         private void OnSaveExecute(object obj)
         {
@@ -56,5 +65,13 @@ namespace FriendStorage.UI.ViewModel
         }
 
         private bool OnSaveCanExecute(object arg) => Friend != null && Friend.IsChanged;
+
+        private void OnDeleteExecute(object obj)
+        {
+            _dataProvider.DeleteFriend(Friend.Id);
+            _eventAggregator.GetEvent<FriendDeletedEvent>().Publish(Friend.Id);
+        }
+
+        private bool OnDeleteCanExecute(object arg) => Friend != null && Friend.Id > 0;
     }
 }

@@ -13,6 +13,7 @@ namespace FriendStorage.Ui.Tests.ViewModel
     public class FriendEditViewModelTests
     {
         private const int _friendId = 5;
+        private readonly Mock<FriendDeletedEvent> _friendDeletedEventMock;
         private readonly Mock<FriendSavedEvent> _friendSavedEventMock;
         private readonly Mock<IEventAggregator> _eventAggregatorMock;
         private readonly Mock<IFriendDataProvider> _dataProviderMock;
@@ -20,9 +21,11 @@ namespace FriendStorage.Ui.Tests.ViewModel
 
         public FriendEditViewModelTests()
         {
+            _friendDeletedEventMock = new Mock<FriendDeletedEvent>();
             _friendSavedEventMock = new Mock<FriendSavedEvent>();
             _eventAggregatorMock = new Mock<IEventAggregator>();
             _eventAggregatorMock.Setup(ea => ea.GetEvent<FriendSavedEvent>()).Returns(_friendSavedEventMock.Object);
+            _eventAggregatorMock.Setup(ea => ea.GetEvent<FriendDeletedEvent>()).Returns(_friendDeletedEventMock.Object);
 
             _dataProviderMock = new Mock<IFriendDataProvider>();
             _dataProviderMock.Setup(dp => dp.GetFriendById(_friendId))
@@ -140,6 +143,69 @@ namespace FriendStorage.Ui.Tests.ViewModel
             _viewModel.Friend.IsDeveloper.Should().BeFalse();
 
             _dataProviderMock.Verify(dp => dp.GetFriendById(It.IsAny<int>()), Times.Never);
+        }
+
+        [Fact]
+        public void ShouldEnableDeleteCommandForExistingFriend()
+        {
+            _viewModel.Load(_friendId);
+            _viewModel.DeleteCommand.CanExecute(null).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShouldDisableDeleteCommandForNewFriend()
+        {
+            _viewModel.Load(null);
+            _viewModel.DeleteCommand.CanExecute(null).Should().BeFalse();
+            Assert.False(_viewModel.DeleteCommand.CanExecute(null));
+        }
+
+        [Fact]
+        public void ShouldDisableDeleteCommandWithoutLoad()
+        {
+            _viewModel.DeleteCommand.CanExecute(null).Should().BeFalse();
+        }
+
+        [Fact]
+        public void ShouldRaiseCanExecuteChangedForDeleteCommandWhenAcceptingChanges()
+        {
+            _viewModel.Load(_friendId);
+            var isFired = false;
+            _viewModel.Friend.FirstName = "Changed";
+            _viewModel.DeleteCommand.CanExecuteChanged += (s, e) => isFired = true;
+            _viewModel.Friend.AcceptChanges();
+
+            isFired.Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShouldRaiseCanExecuteChangedForDeleteCommandAfterLoad()
+        {
+            var isFired = false;
+            _viewModel.DeleteCommand.CanExecuteChanged += (s, e) => isFired = true;
+            _viewModel.Load(_friendId);
+
+            isFired.Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShouldCallDeleteFriendWhenDeleteCommandIsExecuted()
+        {
+            _viewModel.Load(_friendId);
+
+            _viewModel.DeleteCommand.Execute(null);
+
+            _dataProviderMock.Verify(dp => dp.DeleteFriend(_friendId), Times.Once);
+        }
+
+        [Fact]
+        public void ShouldPublishFriendDeletedEventWhenDeleteCommandIsExecuted()
+        {
+            _viewModel.Load(_friendId);
+
+            _viewModel.DeleteCommand.Execute(null);
+
+            _friendDeletedEventMock.Verify(e => e.Publish(_friendId), Times.Once);
         }
     }
 }
