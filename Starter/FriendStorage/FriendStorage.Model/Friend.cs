@@ -2,7 +2,7 @@
 
 namespace FriendStorage.Model
 {
-  public class Friend
+    public class Friend
   {
     public int Id { get; set; }
 

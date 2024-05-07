@@ -4,9 +4,6 @@ namespace FriendStorage.UI.View
 {
   public partial class FriendEditView : UserControl
   {
-    public FriendEditView()
-    {
-      InitializeComponent();
+        public FriendEditView() => InitializeComponent();
     }
-  }
 }
