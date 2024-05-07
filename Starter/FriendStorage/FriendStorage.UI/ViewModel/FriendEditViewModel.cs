@@ -35,9 +35,10 @@ namespace FriendStorage.UI.ViewModel
             }
         }
 
-        public virtual void Load(int friendId)
+        public virtual void Load(int? friendId)
         {
-            var friend = _dataProvider.GetFriendById(friendId);
+            // here we handle new friends that not exists yet
+            var friend = friendId.HasValue ? _dataProvider.GetFriendById(friendId.Value) : new Friend();
 
             Friend = new FriendWrapper(friend);
             Friend.PropertyChanged += OnFriendPropertyChanged;

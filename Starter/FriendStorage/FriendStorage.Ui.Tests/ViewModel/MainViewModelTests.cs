@@ -8,6 +8,8 @@ using Moq;
 using Prism.Events;
 using Xunit;
 
+#nullable disable
+
 namespace FriendStorage.Ui.Tests.ViewModel
 {
     public class MainViewModelTests
@@ -36,8 +38,8 @@ namespace FriendStorage.Ui.Tests.ViewModel
         {
             var friendEditViewModelMock = new Mock<IFriendEditViewModel>();
             friendEditViewModelMock.Setup(vm => vm.Load(It.IsAny<int>()))
-              .Callback<int>(friendId => friendEditViewModelMock.Setup(vm => vm.Friend)
-            .Returns(new FriendWrapper(new Friend { Id = friendId })));
+              .Callback<int?>(friendId => friendEditViewModelMock.Setup(vm => vm.Friend)
+            .Returns(new FriendWrapper(new Friend { Id = friendId.Value })));
             _friendEditViewModelMocks.Add(friendEditViewModelMock);
             return friendEditViewModelMock.Object;
         }
@@ -95,6 +97,19 @@ namespace FriendStorage.Ui.Tests.ViewModel
             _viewModel.CloseFriendTabCommand.Execute(friendEditVm);
 
             _viewModel.FriendEditViewModels.Should().BeEmpty();
+        }
+
+        [Fact]
+        public void ShouldAddFriendEditViewModelAndLoadItWithIdNullAndSelectIt()
+        {
+            _viewModel.AddFriendCommand.Execute(null);
+
+            _viewModel.FriendEditViewModels.Should().ContainSingle();
+
+            var friendEditVm = _viewModel.FriendEditViewModels.First();
+            _viewModel.SelectedFriendEditViewModel.Should().Be(friendEditVm);
+
+            _friendEditViewModelMocks.First().Verify(vm => vm.Load(null), Times.Once);
         }
     }
 }

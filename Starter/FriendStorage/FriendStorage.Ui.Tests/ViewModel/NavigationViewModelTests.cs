@@ -7,6 +7,8 @@ using Moq;
 using Prism.Events;
 using Xunit;
 
+#nullable disable
+
 namespace FriendStorage.Ui.Tests.ViewModel
 {
     public class NavigationViewModelTests
@@ -78,6 +80,27 @@ namespace FriendStorage.Ui.Tests.ViewModel
               });
 
             navigationItem.DisplayMember.Should().Be("Anna Huber");
+        }
+
+        [Fact]
+        public void ShouldAddNavigationItemWhenAddedFriendIsSaved()
+        {
+            _viewModel.Load();
+
+            const int newFriendId = 97;
+
+            _friendSavedEvent.Publish(new Friend
+            {
+                Id = newFriendId,
+                FirstName = "Anna",
+                LastName = "Huber"
+            });
+
+            _viewModel.Friends.Should().HaveCount(3);
+
+            var addedItem = _viewModel.Friends.SingleOrDefault(f => f.Id == newFriendId);
+            addedItem.Should().NotBeNull();
+            addedItem.DisplayMember.Should().Be("Anna Huber");
         }
     }
 }

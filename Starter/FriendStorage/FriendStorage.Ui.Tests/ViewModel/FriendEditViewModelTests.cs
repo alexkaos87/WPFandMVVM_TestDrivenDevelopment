@@ -125,5 +125,21 @@ namespace FriendStorage.Ui.Tests.ViewModel
             _viewModel.SaveCommand.Execute(null);
             _friendSavedEventMock.Verify(e => e.Publish(_viewModel.Friend.Model), Times.Once);
         }
+
+        [Fact]
+        public void ShouldCreateNewFriendWhenNullIsPassedToLoadMethod()
+        {
+            _viewModel.Load(null);
+
+            _viewModel.Friend.Should().NotBeNull();
+            
+            _viewModel.Friend.Id.Should().Be(0);
+            _viewModel.Friend.FirstName.Should().BeNull();
+            _viewModel.Friend.LastName.Should().BeNull();
+            _viewModel.Friend.Birthday.Should().BeNull();
+            _viewModel.Friend.IsDeveloper.Should().BeFalse();
+
+            _dataProviderMock.Verify(dp => dp.GetFriendById(It.IsAny<int>()), Times.Never);
+        }
     }
 }

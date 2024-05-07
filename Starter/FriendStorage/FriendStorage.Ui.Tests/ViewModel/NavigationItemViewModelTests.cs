@@ -38,10 +38,7 @@ namespace FriendStorage.Ui.Tests.ViewModel
         [Fact]
         public void ShouldRaisePropertyChangedEventForDisplayMember()
         {
-            var isFired = _viewModel.IsPropertyChangedFired(() =>
-            {
-                _viewModel.DisplayMember = "Changed";
-            }, nameof(_viewModel.DisplayMember));
+            var isFired = _viewModel.IsPropertyChangedFired(() => _viewModel.DisplayMember = "Changed", nameof(_viewModel.DisplayMember));
 
             isFired.Should().BeTrue();
         }
