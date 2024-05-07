@@ -18,7 +18,7 @@ namespace FriendStorage.UI.ViewModel
         }
         public ObservableCollection<NavigationItemViewModel> Friends { get; private set; }
 
-        public void Load()
+        public virtual void Load()
         {
             Friends.Clear();
             foreach (var friend in _dataProvider.GetAllFriends())

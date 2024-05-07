@@ -10,7 +10,7 @@ namespace FriendStorage.UI.DataProvider
 
         public FriendDataProvider(Func<IDataService> dataServiceCreator) => _dataServiceCreator = dataServiceCreator;
 
-        public void DeleteFriend(int id)
+        public virtual void DeleteFriend(int id)
         {
             using (var dataService = _dataServiceCreator())
             { 
@@ -18,7 +18,7 @@ namespace FriendStorage.UI.DataProvider
             }
         }
 
-        public Friend GetFriendById(int id)
+        public virtual Friend GetFriendById(int id)
         {
             using (var dataService = _dataServiceCreator())
             {     
@@ -26,7 +26,7 @@ namespace FriendStorage.UI.DataProvider
             }
         }
 
-        public void SaveFriend(Friend friend)
+        public virtual void SaveFriend(Friend friend)
         {
             using (var dataService = _dataServiceCreator())
             { 

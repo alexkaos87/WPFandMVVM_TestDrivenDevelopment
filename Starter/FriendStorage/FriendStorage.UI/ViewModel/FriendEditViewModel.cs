@@ -11,7 +11,7 @@ namespace FriendStorage.UI.ViewModel
 
         public FriendEditViewModel(IFriendDataProvider dataProvider) => _dataProvider = dataProvider;
 
-        public Friend Friend
+        public virtual Friend Friend
         {
             get => _friend; 
             set
@@ -21,7 +21,7 @@ namespace FriendStorage.UI.ViewModel
             }
         }
 
-        public void Load(int friendId)
+        public virtual void Load(int friendId)
         {
             var friend = _dataProvider.GetFriendById(friendId);
 
