@@ -3,6 +3,7 @@ using FriendStorage.Model;
 using FriendStorage.Ui.Tests.Extensions;
 using FriendStorage.UI.Events;
 using FriendStorage.UI.ViewModel;
+using FriendStorage.UI.Wrapper;
 using Moq;
 using Prism.Events;
 using Xunit;
@@ -36,7 +37,7 @@ namespace FriendStorage.Ui.Tests.ViewModel
             var friendEditViewModelMock = new Mock<IFriendEditViewModel>();
             friendEditViewModelMock.Setup(vm => vm.Load(It.IsAny<int>()))
               .Callback<int>(friendId => friendEditViewModelMock.Setup(vm => vm.Friend)
-            .Returns(new Friend { Id = friendId }));
+            .Returns(new FriendWrapper(new Friend { Id = friendId })));
             _friendEditViewModelMocks.Add(friendEditViewModelMock);
             return friendEditViewModelMock.Object;
         }

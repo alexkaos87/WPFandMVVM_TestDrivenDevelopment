@@ -1,0 +1,80 @@
+﻿using FriendStorage.Model;
+using FriendStorage.UI.ViewModel;
+using System;
+using System.Runtime.CompilerServices;
+
+namespace FriendStorage.UI.Wrapper
+{
+    public class FriendWrapper : ViewModelBase
+    {
+        private readonly Friend _friend;
+        private bool _isChanged;
+
+        public FriendWrapper(Friend friend) => _friend = friend;
+
+        public Friend Model => _friend;
+
+        public bool IsChanged
+        {
+            get => _isChanged;
+            private set
+            {
+                _isChanged = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public void AcceptChanges() => IsChanged = false;
+
+        public int Id => _friend.Id;
+
+        public string FirstName
+        {
+            get => _friend.FirstName;
+            set
+            {
+                _friend.FirstName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string LastName
+        {
+            get => _friend.LastName;
+            set
+            {
+                _friend.LastName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public DateTime? Birthday
+        {
+            get => _friend.Birthday;
+            set
+            {
+                _friend.Birthday = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool IsDeveloper
+        {
+            get => _friend.IsDeveloper;
+            set
+            {
+                _friend.IsDeveloper = value;
+                OnPropertyChanged();
+            }
+        }
+
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            base.OnPropertyChanged(propertyName);
+            if (propertyName != nameof(IsChanged))
+            {
+                IsChanged = true;
+            }
+        }
+    }
+}
